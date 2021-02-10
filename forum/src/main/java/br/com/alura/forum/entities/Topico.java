@@ -11,7 +11,7 @@ public class Topico {
 	private Long id;
 	private String titulo;
 	private String mensagem;
-	private LocalDateTime dataCriacao;
+	private LocalDateTime dataCriacao = LocalDateTime.now();
 	private StatusTopico status = StatusTopico.NAO_RESPONDIDO;
 	private Usuario usuario;
 	private Curso curso;
