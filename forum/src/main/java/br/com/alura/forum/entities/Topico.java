@@ -39,29 +39,8 @@ public class Topico {
 	private List<Resposta> respostas = new ArrayList<>();
 	
 	public Topico() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
-	public Topico(Long id, String titulo, String mensagem, LocalDateTime dataCriacao, StatusTopico status,
-			Usuario usuario, Curso curso, List<Resposta> respostas) {
-		this.id = id;
-		this.titulo = titulo;
-		this.mensagem = mensagem;
-		this.dataCriacao = dataCriacao;
-		this.status = status;
-		this.usuario = usuario;
-		this.curso = curso;
-		this.respostas = respostas;
-	}
 	
-	public Topico(String titulo, String mensagem, Curso curso) {
-
-		this.titulo = titulo;
-		this.mensagem = mensagem;
-		this.curso = curso;
-	}
-	
+	}	
 
 	public Long getId() {
 		return id;

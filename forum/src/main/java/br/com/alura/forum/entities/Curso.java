@@ -13,14 +13,12 @@ public class Curso {
 	private Long id;
 	private String nome;
 	private String categoria;
+	
 	public Curso() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	public Curso(String nome, String categoria) {
-		this.nome = nome;
-		this.categoria = categoria;
-	}
+
 	public Long getId() {
 		return id;
 	}

@@ -24,19 +24,7 @@ public class Resposta {
 	private Boolean solução = false;
 	
 	public Resposta() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
-
-	public Resposta(Long id, String mensagem, Topico topico, LocalDateTime dataCriacao, Usuario autor,
-			Boolean solução) {
-		super();
-		this.id = id;
-		this.mensagem = mensagem;
-		this.topico = topico;
-		this.dataCriacao = dataCriacao;
-		this.autor = autor;
-		this.solução = solução;
+	
 	}
 
 	public Long getId() {
