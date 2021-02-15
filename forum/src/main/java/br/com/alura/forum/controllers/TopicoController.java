@@ -2,19 +2,31 @@ package br.com.alura.forum.controllers;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
+
+import javax.transaction.Transactional;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-
+import br.com.alura.forum.dto.DetalhesTopicoDTO;
 import br.com.alura.forum.dto.TopicoDTO;
 import br.com.alura.forum.entities.Topico;
+import br.com.alura.forum.forms.AtualizacaoTopicForm;
 import br.com.alura.forum.forms.TopicForm;
 import br.com.alura.forum.repositories.CursoRepository;
 import br.com.alura.forum.repositories.TopicoRepository;
@@ -23,35 +35,79 @@ import br.com.alura.forum.repositories.TopicoRepository;
 @RestController
 @RequestMapping("/topicos")
 public class TopicoController {
-	
+
 	@Autowired
 	private TopicoRepository repository;
-	
+
 	@Autowired
 	private CursoRepository cursoRepository;
-	
+
 	@GetMapping
-	public List<TopicoDTO> list(String nomeCurso) {
+	public Page<TopicoDTO> list(@RequestParam(required = false) String nomeCurso, @RequestParam int pag, @RequestParam int qtd) {
+		
+		Pageable paginacao = PageRequest.of(pag, qtd);
 		
 		if (nomeCurso == null) {
-			List<Topico> topicos = repository.findAll();
-			 return TopicoDTO.converter(topicos);
-		}else {
-			
-			List<Topico> topicos = repository.findByCursoNome(nomeCurso);
-			 return TopicoDTO.converter(topicos);
+			Page<Topico> topicos = repository.findAll(paginacao);
+			return TopicoDTO.converter(topicos);
+		} else {
+
+			Page<Topico> topicos = repository.findByCursoNome(nomeCurso, paginacao);
+			return TopicoDTO.converter(topicos);
 		}
-	
+
 	}
-	
+
 	@PostMapping
-	public ResponseEntity<TopicoDTO> cadastrar(@RequestBody TopicForm form, UriComponentsBuilder uriBuilder) {
+	@Transactional
+	public ResponseEntity<TopicoDTO> cadastrar(@RequestBody @Valid TopicForm form, UriComponentsBuilder uriBuilder) {
 		Topico topico = form.converter(cursoRepository);
 		repository.save(topico);
-		
-		URI uri = uriBuilder.path("/topicos/{id}").
-				buildAndExpand(topico.getId()).toUri();
-		
+
+		URI uri = uriBuilder.path("/topicos/{id}").buildAndExpand(topico.getId()).toUri();
+
 		return ResponseEntity.created(uri).body(new TopicoDTO(topico));
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<DetalhesTopicoDTO> detalhar(@PathVariable Long id) {
+
+		Optional<Topico> topico = repository.findById(id);
+
+		if (topico.isPresent()) {
+			return ResponseEntity.ok(new DetalhesTopicoDTO(topico.get()));
+		}
+
+		return ResponseEntity.notFound().build();
+	}
+
+	@PutMapping("/{id}")
+	@Transactional
+	public ResponseEntity<TopicoDTO> atualizar(@PathVariable Long id, @RequestBody @Valid AtualizacaoTopicForm form) {
+
+		Optional<Topico> optional = repository.findById(id);
+
+		if (optional.isPresent()) {
+			Topico topico = form.atualizar(id, repository);
+			return ResponseEntity.ok(new TopicoDTO(topico));
+		}
+
+		return ResponseEntity.notFound().build();
+	}
+
+	@DeleteMapping("/{id}")
+	@Transactional
+	public ResponseEntity<TopicoDTO> remover(@PathVariable Long id) {
+
+		Optional<Topico> optional = repository.findById(id);
+
+		if (optional.isPresent()) {
+
+			repository.deleteById(id);
+			return ResponseEntity.ok().build();
+		}
+
+		return ResponseEntity.notFound().build();
+
 	}
 }
